@@ -1,7 +1,7 @@
 {
   "perl": "6.*",
   "name": "Serialize::Tiny",
-  "version": "1",
+  "version": "2",
   "description": "A very simple `serialize` sub to get public attribute values",
   "depends": [],
   "source-url": "git://github.com/vendethiel/Serialize-Tiny.pm6.git",

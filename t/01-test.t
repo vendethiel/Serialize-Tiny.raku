@@ -1,8 +1,9 @@
 # TODO get a nicer filename...
 use Test;
+use lib './lib';
 use Serialize::Tiny;
 
-plan 15;
+plan 17;
 
 {
   my class A {
@@ -101,9 +102,30 @@ plan 15;
 	my A $a .= new(:x(1, 2, 3), :y("hey"));
 	my B $b .= new;
 	my C $c .= new(:$a, :$b);
-	#my %h = serialize($b, :class-key{ type => $_ ~~ / [ ^ | '::' ] <( \w+ $ /; });
-	my %h = serialize($c, :class-key({ $_ => $_ }));
-	is %h<C>, 'C', "Allows to override key name";
-	is %h<b><B>, 'B', "Even when nested";
-	is %h<a>.keys.sort, <A x y>, "Even with other attributes";
+  my %h = serialize($c, :class-key({ type => $_ }));
+	is %h<type>, 'C', "Allows to override key name";
+	is %h<b><type>, 'B', "Even when nested";
+	is %h<a>.keys.sort, <type x y>, "Even with other attributes";
 }
+
+{
+  my class A {
+    has $.x;
+  }
+  my class B {
+    has A %.v;
+  }
+  my B $b .= new(v => {
+    a1 => A.new(:1x),
+    a2 => A.new(:2x),
+    a3 => A.new(:3x),
+  });
+  my %h = serialize($b);
+  is %h.keys, <v>, 'It has a single h key';
+  is %h<v>.keys.sort, <a1 a2 a3>, 'It has all the hash keys';
+}
+
+# Todo test class-key function
+#my %h = serialize($b, :class-key({ type => $^t ~~ / [ ^ | '::' ] <( \w+ $ /; }));
+# TODO test ForceInclude
+# TODO test ForceExclude

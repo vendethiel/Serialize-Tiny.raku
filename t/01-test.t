@@ -3,7 +3,7 @@ use Test;
 use lib './lib';
 use Serialize::Tiny;
 
-plan 17;
+plan 16;
 
 {
   my class A {
@@ -87,7 +87,7 @@ plan 17;
   is %h<a>.map(*<x>[1]), (2, 100, 0), 'The values have been extracted correctly';
 }
 
-{
+subtest "class-key", {
   my class A {
 		has Int @.x;
 		has $.y;
@@ -108,7 +108,7 @@ plan 17;
 	is %h<a>.keys.sort, <type x y>, "Even with other attributes";
 }
 
-{
+subtest "serialize hash", {
   my class A {
     has $.x;
   }
@@ -123,9 +123,32 @@ plan 17;
   my %h = serialize($b);
   is %h.keys, <v>, 'It has a single h key';
   is %h<v>.keys.sort, <a1 a2 a3>, 'It has all the hash keys';
+  is %h<v><a1>.keys, <x>;
+  is %h<v><a1><x>, 1;
+  is %h<v><a2>.keys, <x>;
+  is %h<v><a2><x>, 2;
+  is %h<v><a3>.keys, <x>;
+  is %h<v><a3><x>, 3;
+}
+
+subtest "excluded_from_serialization", {
+  my class A {
+    has $.x is excluded_from_serialization;
+  };
+  my $a = A.new(x => 1);
+  my %h = serialize($a);
+  is %h.keys, (), "No keys";
+};
+
+subtest "included_in_serialization", {
+  my class A {
+    has Int $!x is included_in_serialization;
+  };
+  my $a = A.new(x => 1);
+  my %h = serialize($a);
+  is %h.keys, <x>, "Force-included key is present";
+  is %h<x>, 1, "Key has correct value";
 }
 
 # Todo test class-key function
 #my %h = serialize($b, :class-key({ type => $^t ~~ / [ ^ | '::' ] <( \w+ $ /; }));
-# TODO test ForceInclude
-# TODO test ForceExclude

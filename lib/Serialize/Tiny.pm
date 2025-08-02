@@ -3,13 +3,16 @@ unit module Serialize::Tiny;
 role ForceInclude {}
 role ForceExclude {}
 
-multi sub trait_mod:<is>(Attribute:D $a, :$included_in_serialization!) {
+multi sub trait_mod:<is>(Attribute:D $a, :included_in_serialization($)!) is export {
   die "An attribute cannot be both included and excluded" if $a ~~ ForceExclude;
+  # TODO warn unnecessary if .has_accessor?
+  trait_mod:<is>($a, :built); # Needs it to be built if it isn't public, otherwise .get_value() returns Any
   $a does ForceInclude;
 }
 
-multi sub trait_mod:<is>(Attribute:D $a, :$excluded_in_serialization!) {
+multi sub trait_mod:<is>(Attribute:D $a, :excluded_from_serialization($)!) is export {
   die "An attribute cannot be both included and excluded" if $a ~~ ForceExclude;
+  # TODO warn unnecessary unless .has_accessor?
   $a does ForceExclude;
 }
 

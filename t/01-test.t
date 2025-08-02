@@ -3,7 +3,7 @@ use Test;
 use lib './lib';
 use Serialize::Tiny;
 
-plan 16;
+plan 17;
 
 {
   my class A {
@@ -150,5 +150,11 @@ subtest "included_in_serialization", {
   is %h<x>, 1, "Key has correct value";
 }
 
-# Todo test class-key function
-#my %h = serialize($b, :class-key({ type => $^t ~~ / [ ^ | '::' ] <( \w+ $ /; }));
+subtest "class-key function", {
+  my class A::B::C {
+  };
+  my sub f($s) { type => $s.split("::")[*-1] }
+  my %h = serialize(A::B::C.new, :class-key(&f));
+  is %h.keys, <type>;
+  is %h<type>, "C", "class-key was called";
+}

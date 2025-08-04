@@ -4,9 +4,9 @@
   "version": "2",
   "description": "A very simple `serialize` sub to get public attribute values",
   "depends": [],
-  "source-url": "git://github.com/vendethiel/Serialize-Tiny.pm6.git",
+  "source-url": "git://github.com/vendethiel/Serialize-Tiny.raku.git",
   "author": "vendethiel",
   "provides": {
-    "Serialize::Tiny": "lib/Serialize/Tiny.pm"
+    "Serialize::Tiny": "lib/Serialize/Tiny.rakumod"
   }
 }
